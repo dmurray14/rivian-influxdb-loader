@@ -1,0 +1,50 @@
+version: '2.0'
+
+services:
+  grafana:
+    image: grafana/grafana-oss:main
+    container_name: rivian-grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - TZ="America/New_York"
+      - GF_SECURITY_ADMIN_USER=rivian
+      - GF_SECURITY_ADMIN_PASSWORD=tankturn
+    networks:
+      - rivian-data
+    volumes:
+      - /home/localadmin/compose/rivian-data/storage/rivian-grafana:/var/lib/grafana
+  influxdb:
+    image: influxdb:latest
+    container_name: rivian-influxdb
+    restart: unless-stopped
+    ports:
+      - 8086:8086
+    environment:
+      - TZ="America/New_York"
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=rivian
+      - DOCKER_INFLUXDB_INIT_PASSWORD=tankturn
+      - DOCKER_INFLUXDB_INIT_ORG=default
+      - DOCKER_INFLUXDB_INIT_BUCKET=rivian_data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=yyGao5gxwo6SuaVRlcYS58VuJYIe9Y7hIeYl2McAZQUHhOJmhS_CFLYqSg7lW0LQbcsicGSa5s9jsjsJaiM8ZQ==
+    networks:
+      - rivian-data
+    volumes:
+      - /home/localadmin/compose/rivian-data/storage/rivian-influxdb:/var/lib/influxdb
+  api-poller:
+    container_name: rivian-api-poller
+    build:
+      context: build/.
+      dockerfile: Dockerfile
+    networks:
+      - rivian-data
+    environment:
+      - RIVIAN_VEHICLE_ID=<YOURVEHICLEID>
+      - RIVIAN_USERNAME=<YOUREMAILADDRESS>
+      - RIVIAN_PASSWORD=<YOURPASSWORD>
+networks:
+  rivian-data:
+    external:
+      name: rivian-data
