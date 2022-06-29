@@ -24,8 +24,9 @@ class RivianAPI:
         self._refresh_token = ''
         self._token_expires_ts = 0
 
-        self._username = username
-        self._password = password
+        self._username  = username
+        self._password  = password
+        self._vehicleId = vehicleId
 
         self._session = requests.Session()
 
@@ -91,7 +92,7 @@ class RivianAPI:
     def get_vehicle_all(self) -> dict:
         payload = f'''
         {{
-            "car": "{VEHICLE_ID}",
+            "car": "{self._vehicleId}",
             "properties": [
                 "$gnss",
                 "adas/*",
