@@ -14,7 +14,10 @@ services:
     networks:
       - rivian-data
     volumes:
-      - /home/localadmin/compose/rivian-data/storage/rivian-grafana:/var/lib/grafana
+      - grafana:/var/lib/grafana
+      - ./provisioning/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./provisioning/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./provisioning/grafana/dashboard_data:/var/lib/grafana/dashboards
   influxdb:
     image: influxdb:latest
     container_name: rivian-influxdb
@@ -32,7 +35,7 @@ services:
     networks:
       - rivian-data
     volumes:
-      - /home/localadmin/compose/rivian-data/storage/rivian-influxdb:/var/lib/influxdb
+      - influxdb:/var/lib/influxdb2
   api-poller:
     container_name: rivian-api-poller
     build:
@@ -41,10 +44,13 @@ services:
     networks:
       - rivian-data
     environment:
-      - RIVIAN_VEHICLE_ID=<YOURVEHICLEID>
-      - RIVIAN_USERNAME=<YOUREMAILADDRESS>
-      - RIVIAN_PASSWORD=<YOURPASSWORD>
+      - RIVIAN_VEHICLE_ID=${RIVIAN_VEHICLE_ID}
+      - RIVIAN_USERNAME=${RIVIAN_USERNAME}
+      - RIVIAN_PASSWORD=${RIVIAN_PASSWORD}
 networks:
   rivian-data:
-    external:
-      name: rivian-data
+    driver: bridge
+
+volumes:
+  influxdb:
+  grafana:
